@@ -1,21 +1,17 @@
-const morgan = require("morgan")
+const morgan = require('morgan');
 
-/**
- * morgan wrapper
- * @returns {morgan}
- */
 module.exports = function setLogger() {
   // http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html
   const red = "\x1B[31m",
-    green = "\x1B[32m",
-    yellow = "\x1B[33m",
-    cyan = "\x1B[36m",
-    white = "\x1B[37m",
-    endColor = "\033[0m"
+        green = "\x1B[32m",
+        yellow = "\x1B[33m",
+        cyan = "\x1B[36m",
+        white = "\x1B[37m",
+        endColor = "\033[0m"
 
   // Redefind method token
   morgan.token("method", function (req, res) {
-    let color
+    let color;
 
     if (req.method === "GET") color = green
     else if (req.method === "POST") color = cyan

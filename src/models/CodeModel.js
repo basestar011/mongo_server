@@ -2,9 +2,9 @@ const mongoose = require('mongoose')
 
 const codeSchema = mongoose.Schema({
   model: String,
-  code: String
+  code: Number
 });
 
-const CodeModel = mongoose.model('code', codeSchema);
+const Code = mongoose.model('Code', codeSchema);
 
-module.exports = { CodeModel };
+module.exports = { Code };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { UserModel } = require('../models/UserModel');
+const { User } = require('../models');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
@@ -9,7 +9,7 @@ router.post('/login', async (req, res) => {
   const { id, password } = req.body;
 
   // user 검증
-  const user = await UserModel.findOne({ id });
+  const user = await User.findOne({ id });
   if(!user) return res.status(401).send({ message: `Cannot find User: ${id}` });
   if(user.password !== password) return res.status(401).send({ message: 'Incorrect password' });
 

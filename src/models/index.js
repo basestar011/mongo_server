@@ -1,7 +1,5 @@
-const { UserModel } = require('./UserModel');
-const { CategoryModel } = require('./CategoryModel');
-const { CodeModel } = require('./CodeModel');
+const { User } = require('./UserModel');
+const { Category } = require('./CategoryModel');
+const { Code } = require('./CodeModel');
 
-module.exports = {
-  UserModel, CategoryModel, CodeModel
-}
+module.exports = { User, Category, Code }

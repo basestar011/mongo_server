@@ -1,23 +1,15 @@
 const express = require('express');
-const { CategoryModel, CodeModel } = require('../models');
-const getNextSequence = require('../utils/getNextSequence').getNextSequence;
-
 const router = express.Router();
+
+const categoryService = require('../services/category');
 
 router
   // create Category
   .post('', async (req, res) => {
     const { name } = req.body;
     try {
-      /** 1. increment category code */
-      const categoryCode = await CodeModel.findOne({ model: 'category' });
-      const code = getNextSequence(categoryCode.code);
-      await CodeModel.updateOne({ model: 'category' }, { code });
-
-      /** 2. create category with next category code */
-      await CategoryModel.create({ code, name });
-
-      res.status(201).json({ code, name });
+      const newCategory = await categoryService.create(name);
+      res.status(201).json({ category: newCategory });
     } catch (error) {
       console.error(error);
       res.status(500).json({ [error.name]: error.message });
@@ -25,7 +17,8 @@ router
   })
   // get Category by code
   .get('/:code', (req, res) => {
-    console.log(req.params);
+    const { code } = req.params;
+
     res.status(200).send('request category');
   })
 

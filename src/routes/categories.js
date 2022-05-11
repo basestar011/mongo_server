@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const categoryService = require('../services/category');
 
 router
@@ -9,10 +8,9 @@ router
     const { name } = req.body;
     try {
       const newCategory = await categoryService.create(name);
-      res.status(201).json({ category: newCategory });
+      return res.status(201).json({ category: newCategory });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ [error.name]: error.message });
+      return res.status(500).json({ error });
     }
   })
   // get Category by code

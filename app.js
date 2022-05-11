@@ -1,5 +1,9 @@
-const express = require('express');
+/** load environment variables first */
 const dotenv = require('dotenv');
+process.env.NODE_ENV && dotenv.config({ path: `${__dirname}/.env.${process.env.NODE_ENV}` });
+
+/** import module */
+const express = require('express');
 const cors = require('cors');
 const morgan = require('./src/config/morgan');
 const checkAuth = require('./src/utils/checkAuth');
@@ -7,9 +11,6 @@ const auth = require('./src/routes/auth');
 const categories = require('./src/routes/categories');
 const users = require('./src/routes/users')
 const mongoose = require('mongoose');
-
-/** load environment variables */
-process.env.NODE_ENV && dotenv.config({ path: `${__dirname}/.env.${process.env.NODE_ENV}` });
 
 const app = express();
 

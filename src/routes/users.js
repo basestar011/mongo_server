@@ -11,7 +11,8 @@ router.post('', async (req, res) => {
   } catch (error) {
     if(error.name === 'UserDuplicateError')
       return res.status(400).json({ error })
-    else res.status(500).json({ error });
+    else
+      return res.status(500).json({ error });
   }
 });
 

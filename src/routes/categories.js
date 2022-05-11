@@ -8,7 +8,6 @@ router
   // create Category
   .post('', async (req, res) => {
     const { name } = req.body;
-    console.log('create category: ' + name);
     try {
       /** 1. increment category code */
       const categoryCode = await CodeModel.findOne({ model: 'category' });

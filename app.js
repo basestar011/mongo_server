@@ -8,8 +8,8 @@ const categories = require('./src/routes/categories');
 const users = require('./src/routes/users')
 const mongoose = require('mongoose');
 
-/** set environment if necessary */
-process.env.NODE_ENV === 'local' && dotenv.config({ path: __dirname + '/.env' });
+/** load environment variables */
+process.env.NODE_ENV && dotenv.config({ path: `${__dirname}/.env.${process.env.NODE_ENV}` });
 
 const app = express();
 

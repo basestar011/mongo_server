@@ -22,17 +22,17 @@ router
   .get('/:code', async (req, res) => {
     const { code } = req.params;
     const category = await categoryService.get(code);
-    return res.status(200).json({ category });
+    return category ? res.status(200).json({ category }) : res.status(400).json({ message: `${code} category not found` });
   })
   .patch('/:code', async (req, res) => {
     const { body: { name }, params: { code }} = req;
     const category = await categoryService.update(code, name);
-    return res.status(200).json({ category });
+    return category ? res.status(200).json({ category }) : res.status(400).json({ message: `${code} category not found` });
   })
   .delete('/:code', async (req, res) => {
     const { code } = req.params;
     const result = await categoryService.delete(code);
-    return result ? res.status(204) : res.status(200);
+    return result ? res.sendStatus(200) : res.status(400).json({ message: `${code} category not found` });
   })
 
 module.exports = router;

@@ -15,7 +15,11 @@ module.exports = async (req, res, next) => {
 
       return user ? next() : res.status(401).send('Invalid token');
     } catch (error) {
-      res.status(400).json({ error });
+      if(error.name === 'TokenExpiredError') {
+        return res.status(401).json({ error })
+      } else {
+        res.status(400).json({ error });
+      }
     }
   }
 }

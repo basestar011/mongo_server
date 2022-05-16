@@ -30,6 +30,15 @@ class JwtService {
   verifyToken(token) {
     return jwt.verify(token, this.secretKey);
   }
+  
+  /**
+   * token 복호화 (검증X)
+   * @param {string} token 
+   * @returns {string | jwt.JwtPayload} payload
+   */
+  decodeToken(token) {
+    return jwt.decode(token);
+  }
 }
 
 module.exports = new JwtService(jwt, options);

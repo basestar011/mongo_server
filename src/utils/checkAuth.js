@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
   if(!auth) {
     return res.status(401).send('Unauthorized');
   } else {
-    const token = auth.split(' ')[1];
+    const [, token] = auth.split(' ');
     try {
       const { id, password } = jwtService.verifyToken(token);
       const user = await User.findOne({ id, password });

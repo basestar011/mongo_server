@@ -43,7 +43,7 @@ class AuthService {
       payload = this.jwtService.verifyToken(token);
     } catch (error) {
       if(error.name === 'TokenExpiredError') {
-        payload = this.jwtService.decode(token);
+        payload = this.jwtService.decodeToken(token);
       } else {
         /** 토큰 만료 에러 이외의 에러 발생 시 로그 찍고 null 반환 */
         console.error(error);

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 class JwtService {
   /**
+   * Jwt 서비스 생성
    * @param {Object} jwt jsonwebtoken 라이브러리 
    * @param {string} secretKey token secretKey
    * @param {Object} options token options

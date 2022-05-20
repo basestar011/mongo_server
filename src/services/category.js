@@ -1,4 +1,5 @@
-const { Category } = require('../models')
+const { Category } = require('../models');
+const { DataCreationError } = require('../utils/errors');
 const incrementCode = require('../utils/incrementCode')
 
 /**
@@ -22,15 +23,17 @@ class CategoryService {
   /**
    * 새 카테고리를 생성한다.
    * @param {string} name 카테고리명 
-   * @returns {Promise<Category>} 생성된 카테고리 객체
+   * @returns {Promise<string>} 생성된 카테고리 코드
    */
   async create(name) {
-    /** 1. if exist, increment category code and if not exist, create one */
+    /** 1. name validation */
+    if(name === undefined || name === null || name === '') throw new DataCreationError('Name must be at least 1 characters exclude spaces.');
+    /** 2. get category code : if category code exist, increment that and if not exist, create new one */
     const { code } = await this.codeGenerator(this.modelName);
-    /** 2. create category with next category code */
-    const newCategory = await this.model.create({ code, name });
+    /** 3. create category with next category code */
+    await this.model.create({ code, name });
 
-    return { code: newCategory.code, name: newCategory.name };
+    return code;
   }
 
   /**

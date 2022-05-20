@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const authService = require('../services/auth');
+const { getErrMsg } = require('../utils/errors');
 
 /** 로그인 요청 */
 router
   // get New Token by old token
   .get('', async (req, res) => {
     const auth = req.headers.authorization;
+    if(!auth) return res.sendStatus(401);
     const token = auth.split(' ')[1];
     const newToken = await authService.verifyAndGenerateToken(token);
     return newToken ? res.status(200).send(newToken) : res.sendStatus(401);
@@ -18,10 +20,8 @@ router
       const token = await authService.login(id, password);
       return res.status(201).json(token);
     } catch (error) {
-      if(error.name === 'UserLoginError')
-        return res.status(401).json({ error });
-      else
-        return res.status(500).json({ error })
+      const errCode = error.name === 'UserLoginError' ? 401 : 500;
+      return res.status(errCode).send(getErrMsg(error))
     }
   })
 

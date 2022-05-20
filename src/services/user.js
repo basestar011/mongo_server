@@ -29,7 +29,7 @@ class UserService {
     if(isExist) throw new UserDuplicateError('User id already exists.');
     /** 3. if not exist, create new user */
     const newUser = await this.model.create({ id, password });
-    return newUser;
+    return { id: newUser.id };
   }
 
   /**

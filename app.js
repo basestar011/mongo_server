@@ -22,7 +22,7 @@ app.use(cors());
 
 /** connect mongodb */
 const uri =
-  `mongodb+srv://${process.env.DB_ID}:${process.env.DB_PW}@${process.env.DB_CLUSTER_URL}?retryWrites=true&writeConcern=majority`;
+  `mongodb+srv://${process.env.DB_ID}:${process.env.DB_PW}@${process.env.DB_CLUSTER_URL}?retryWrites=true&w=majority`;
 mongoose.connect(uri, { useNewUrlParser: true })
 .then(console.log('mongodb connected')).catch(console.error);
 

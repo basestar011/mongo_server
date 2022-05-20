@@ -40,5 +40,5 @@ module.exports = function setLogger() {
     return white + "body: " + JSON.stringify(req.body) + endColor
   })
 
-  return morgan(":method :url :status :response-time ms :body")
+  return morgan(":remote-addr :method :url :status :response-time ms :body")
 }

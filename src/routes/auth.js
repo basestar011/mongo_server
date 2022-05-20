@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authService = require('../services/auth');
-const { getErrMsg } = require('../utils/errors');
+const { ErrorResponse } = require('../utils/errors');
 
 /** 로그인 요청 */
 router
@@ -21,7 +21,7 @@ router
       return res.status(201).json(token);
     } catch (error) {
       const errCode = error.name === 'UserLoginError' ? 401 : 500;
-      return res.status(errCode).send(getErrMsg(error))
+      return res.status(errCode).send(new ErrorResponse(error))
     }
   })
 

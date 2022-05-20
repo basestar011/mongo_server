@@ -5,6 +5,26 @@ function getErrMsg(error) {
   return typeof error === 'string' ? error : 'Internal Server Error';
 }
 
+class ErrorResponse {
+  constructor(error) {
+    if(error instanceof Error) {
+      this.name = error.name;
+      this.message = error.message;
+      // this.stack = error.stack;
+    }
+    else if(Array.isArray(error)) {
+      [this.name, this.message] = error;
+    }
+    else if(typeof error === 'string') {
+      this.name = 'Error';
+      this.message = error;
+    } else {
+      this.name = 'Error';
+      this.message = 'Internal Server Error';
+    }
+  }
+}
+
 class UserDuplicateError extends Error {
   constructor(message) {
     super(message);
@@ -27,5 +47,5 @@ class DataCreationError extends Error {
 }
 
 module.exports = {
-  getErrMsg, UserDuplicateError, UserLoginError, DataCreationError
+  ErrorResponse, UserDuplicateError, UserLoginError, DataCreationError
 }

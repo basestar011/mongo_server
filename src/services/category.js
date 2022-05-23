@@ -41,7 +41,7 @@ class CategoryService {
    * @returns {Promise<Array<Category>>}
    */
   async getAll() {
-    const categories = await this.model.find().select('-_id code name');
+    const categories = await this.model.find().select('-__v -_id');
     return categories;
   }
 
@@ -51,7 +51,7 @@ class CategoryService {
    * @returns {Promise<Category>}
    */
   async get(code) {
-    const category = await this.model.findOne({ code }).select('-_id code name')
+    const category = await this.model.findOne({ code }).select('-__v -_id')
     return category;
   }
 
@@ -64,7 +64,7 @@ class CategoryService {
   async update(code, name) {
     const edited = await this.model
       .findOneAndUpdate({ code }, { name }, { new: true })
-      .select('-_id code name');
+      .select('-__v -_id');
     return edited;
   }
 

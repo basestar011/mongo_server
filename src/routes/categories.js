@@ -9,7 +9,7 @@ router
     const categories = await categoryService.getAll();
     return res.status(200).json(categories);
   })
-  // create Category
+  // create category
   .post('', async (req, res) => {
     const { name } = req.body;
     try {
@@ -25,11 +25,13 @@ router
     const category = await categoryService.get(code);
     return category ? res.status(200).json(category) : res.status(400).send(new ErrorResponse(`${code} category not found`));
   })
+  // update category by code
   .patch('/:code', async (req, res) => {
     const { body: { name }, params: { code }} = req;
     const category = await categoryService.update(code, name);
     return category ? res.status(200).json(category) : res.status(400).send(new ErrorResponse(`${code} category not found`));
   })
+  // delete category by code
   .delete('/:code', async (req, res) => {
     const { code } = req.params;
     const result = await categoryService.delete(code);

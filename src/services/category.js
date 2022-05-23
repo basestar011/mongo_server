@@ -13,23 +13,23 @@ class CategoryService {
 
   /**
    * @param {Object} model - mongoose Category Model
-   * @param {Function} codeGenerator - Category 코드의 다음 숫자값 반환해주는 함수
+   * @param {Function} generateCode - Category 코드의 다음 숫자값 반환해주는 함수
    */
-  constructor(model, codeGenerator) {
+  constructor(model, generateCode) {
     this.model = model;
-    this.codeGenerator = codeGenerator;
+    this.generateCode = generateCode;
   }
 
   /**
    * 새 카테고리를 생성한다.
    * @param {string} name 카테고리명 
-   * @returns {Promise<string>} 생성된 카테고리 코드
+   * @returns {Promise<number>} 생성된 카테고리 코드
    */
   async create(name) {
     /** 1. name validation */
     if(name === undefined || name === null || name === '') throw new DataCreationError('Name must be at least 1 characters exclude spaces.');
     /** 2. get category code : if category code exist, increment that and if not exist, create new one */
-    const { code } = await this.codeGenerator(this.modelName);
+    const { code } = await this.generateCode(this.modelName);
     /** 3. create category with next category code */
     await this.model.create({ code, name });
 
@@ -47,7 +47,7 @@ class CategoryService {
 
   /**
    * 특정 카테고리를 조회한다.
-   * @param {string} code 카테고리 code
+   * @param {number} code 카테고리 code
    * @returns {Promise<Category>}
    */
   async get(code) {
@@ -57,7 +57,7 @@ class CategoryService {
 
   /**
    * 카테고리 명을 변경한다.
-   * @param {string} code 카테고리 code
+   * @param {number} code 카테고리 code
    * @param {string} name 카테고리 명
    * @returns {Promise<Category>} update된 카테고리
    */
@@ -70,7 +70,7 @@ class CategoryService {
 
   /**
    * 카테고리를 삭제한다.
-   * @param {string} code 카테고리 code
+   * @param {number} code 카테고리 code
    * @returns {Promise<boolean>} 삭제 성공 여부
    */
   async delete(code) {

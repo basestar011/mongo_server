@@ -18,7 +18,7 @@ router
     const { id, password } = req.body;
     try {
       const token = await authService.login(id, password);
-      return res.status(201).json(token);
+      return res.status(201).send(token);
     } catch (error) {
       const errCode = error.name === 'UserLoginError' ? 401 : 500;
       return res.status(errCode).send(new ErrorResponse(error))

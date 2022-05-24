@@ -48,14 +48,14 @@ router
   })
   // create content by category code
   .post('/:code/contents', async (req, res) => {
-    const { code } = req.params;
+    const code = Number(req.params.code);
     const category = await categoryService.get(code);
-    if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code, title: 'title', detail: { address: 'address', menu: ['1', '2', '3']} })))
+    if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code })))
 
     const { title, detail } = req.body;
     try {
       const contentCode = await contentService.create({ title, detail: detail || {}, cg_code: code });
-      return res.sendStatus(201).json({ code: contentCode });
+      return res.status(201).json({ code: contentCode });
     } catch (error) {
       return res.status(500).send(new ErrorResponse(error));
     }

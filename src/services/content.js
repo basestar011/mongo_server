@@ -31,12 +31,12 @@ class ContentService {
    */
   async create(content) {
     /** 1. validation */
-    const { title, cg_code, detail, created, modified } = content;
+    const { title, cg_code, detail } = content;
     if(title === undefined || cg_code === undefined) throw new DataCreationError('title and Category code must not be undefined');
     /** 2. get content code : if content code exist, increment that and if not exist, create new one */
     const { code } = await this.generateCode(this.modelName);
     /** 3. create category with next category code */
-    await this.model.create({ code, title, cg_code, detail, created, modified });
+    await this.model.create({ code, title, cg_code, detail, created: new Date(), modified: new Date() });
 
     return code;
   }

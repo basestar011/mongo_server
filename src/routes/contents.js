@@ -15,12 +15,12 @@ router
   })
   // create content
   .post('', (req, res) => {
-    const { cg_code, title, detail, created, modified } = req.body;
+    const { cg_code, title, detail } = req.body;
     const category = await categoryService.get(cg_code);
     if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code: cg_code })))
 
     try {
-      const contentCode = await contentService.create({ title, detail: detail || {}, cg_code, created, modified });
+      const contentCode = await contentService.create({ title, detail: detail || {}, cg_code });
       return res.status(201).json({ code: contentCode });
     } catch (error) {
       return res.status(500).send(new ErrorResponse(error));

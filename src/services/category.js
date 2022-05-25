@@ -1,11 +1,13 @@
 const { Category } = require('../models');
 const { DataCreationError } = require('../utils/errors');
 const incrementCode = require('../utils/incrementCode')
+const { checkCode, checkName, checkCodeAndName } = require('../utils/validation/category')
 
 /**
  * @typedef {Object} Category
  * @property {number} code 카테고리 코드
  * @property {string} name 카테고리 명
+ * @property {number} parent 부모 카테고리
  */
 
 class CategoryService {
@@ -24,15 +26,16 @@ class CategoryService {
    * 새 카테고리를 생성한다.
    * @param {string} name 카테고리명 
    * @returns {Promise<number>} 생성된 카테고리 코드
+   * @throws DataMalformedError
    */
   async create(name) {
     /** 1. name validation */
-    if(name === undefined || name === null || name === '') throw new DataCreationError('Name must be at least 1 characters exclude spaces.');
+    const validateResult = checkName(name);
+    if(validateResult) throw validateResult;
     /** 2. get category code : if category code exist, increment that and if not exist, create new one */
     const { code } = await this.generateCode(this.modelName);
     /** 3. create category with next category code */
     await this.model.create({ code, name });
-
     return code;
   }
 
@@ -49,8 +52,13 @@ class CategoryService {
    * 특정 카테고리를 조회한다.
    * @param {number} code 카테고리 code
    * @returns {Promise<Category>}
+   * @throws DataMalformedError
    */
   async get(code) {
+    /** 1. code validation */
+    const validateResult = checkCode(code);
+    if(validateResult) throw validateResult;
+    /** 2. find category by code */
     const category = await this.model.findOne({ code }).select('-__v -_id')
     return category;
   }
@@ -60,8 +68,13 @@ class CategoryService {
    * @param {number} code 카테고리 code
    * @param {string} name 카테고리 명
    * @returns {Promise<Category>} update된 카테고리
+   * @throws DataMalformedError
    */
   async update(code, name) {
+    /** 1. code, name validation */
+    const validateResult = checkCodeAndName(code, name);
+    if(validateResult) throw validateResult;
+    /** 2. update category by code */
     const edited = await this.model
       .findOneAndUpdate({ code }, { name }, { new: true })
       .select('-__v -_id');
@@ -71,11 +84,16 @@ class CategoryService {
   /**
    * 카테고리를 삭제한다.
    * @param {number} code 카테고리 code
-   * @returns {Promise<boolean>} 삭제 성공 여부
+   * @returns {Promise<Category>} 삭제한 카테고리
+   * @throws DataMalformedError
    */
   async delete(code) {
+    /** 1. code validation */
+    const validateResult = checkCode(code);
+    if(validateResult) throw validateResult;
+    /** 2. delete category by code */
     const deleted = await this.model.findOneAndDelete({ code })
-    return deleted !== null;
+    return deleted;
   }
 }
 

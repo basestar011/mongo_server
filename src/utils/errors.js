@@ -51,6 +51,13 @@ class DataNotFoundError extends Error {
   }
 }
 
+class DataMalformedError extends Error {
+  constructor(message) {
+    super(message || 'Data is malformed');
+    this.name = 'DataMalformedError'
+  }
+}
+
 module.exports = {
-  ErrorResponse, UserDuplicateError, UserLoginError, DataCreationError, DataNotFoundError
+  ErrorResponse, UserDuplicateError, UserLoginError, DataCreationError, DataNotFoundError, DataMalformedError
 }

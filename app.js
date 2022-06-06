@@ -9,6 +9,7 @@ const morgan = require('./src/config/morgan');
 const checkAuth = require('./src/utils/checkAuth');
 const auth = require('./src/routes/auth');
 const categories = require('./src/routes/categories');
+const contents = require('./src/routes/contents')
 const users = require('./src/routes/users')
 const mongoose = require('mongoose');
 
@@ -30,6 +31,7 @@ mongoose.connect(uri, { useNewUrlParser: true })
 /** set routes */
 app.use('/auth', auth);
 app.use('/categories', checkAuth, categories);
+app.use('/contents', checkAuth, contents);
 app.use('/users', users);
 
 const port = process.env.PORT || 8000;

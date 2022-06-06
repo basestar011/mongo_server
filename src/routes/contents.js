@@ -6,15 +6,16 @@ const { ErrorResponse, DataNotFoundError } = require('../utils/errors')
 
 router
   // get all contents 
-  .get('', (req, res) => {
-
+  .get('', async (req, res) => {
+    const allContents = await contentService.getAll();
+    return res.status(200).json(allContents);
   })
   // get content by code
-  .get('/:code', (req, res) => {
-
+  .get('/:code', async (req, res) => {
+    
   })
   // create content
-  .post('', (req, res) => {
+  .post('', async (req, res) => {
     const { cg_code, title, detail } = req.body;
     const category = await categoryService.get(cg_code);
     if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code: cg_code })))
@@ -34,3 +35,5 @@ router
   .delete(':code', (req, res) => {
 
   })
+
+  module.exports = router;

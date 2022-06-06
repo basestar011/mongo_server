@@ -16,6 +16,6 @@ function checkAll(title, categoryCode, detail) {
   return checkTitle(title) || checkCategoryCode(categoryCode) || checkDetail(detail)
 }
 
-export {
+module.exports = {
   checkTitle, checkCategoryCode, checkDetail, checkAll
 }

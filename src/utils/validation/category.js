@@ -45,6 +45,6 @@ function checkCodeAndName(code, name) {
   return checkCode(code) || checkName(name);
 }
 
-export {
+module.exports = {
   checkCode, checkName, checkCodeAndName
 }

@@ -2,6 +2,7 @@ const { Content } = require('../models');
 const { DataCreationError } = require('../utils/errors');
 const incrementCode = require('../utils/incrementCode');
 const categoryValidator = require('../utils/validation/category')
+const contentValidator = require('../utils/validation/content')
 
 /**
  * @typedef {Object} Content
@@ -64,17 +65,16 @@ class ContentService {
   }
 
   /**
-   * 카테고리 명을 변경한다.
-   * @param {string} code 카테고리 code
-   * @param {string} name 카테고리 명
-   * @returns {Promise<Category>} update된 카테고리
+   * 특정 컨텐츠를 조회한다.
+   * @param {number} code 컨텐츠 code
+   * @returns {Promise<Content>} 컨텐츠
    */
-  // async update(code, name) {
-  //   const edited = await this.model
-  //     .findOneAndUpdate({ code }, { name }, { new: true })
-  //     .select('-__v -_id');
-  //   return edited;
-  // }
+  async get(code) {
+    const validateResult = contentValidator.checkCode(code);
+    if(validateResult) throw validateResult;
+    const content = await this.model.findOne({ code }).select('-__v -_id');
+    return content;
+  }
 
   /**
    * 카테고리를 삭제한다.

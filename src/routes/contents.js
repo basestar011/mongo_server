@@ -12,7 +12,7 @@ router
   })
   // get content by code
   .get('/:code', async (req, res) => {
-    
+    const { code } = req.params;
   })
   // create content
   .post('', async (req, res) => {

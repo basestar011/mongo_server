@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { uploadFileToS3 } = require('../utils/aws')
+const iconv = require('iconv-lite');
 const categoryService = require('../services/category');
 const contentService = require('../services/content')
 const { ErrorResponse, DataNotFoundError } = require('../utils/errors')
@@ -70,7 +72,22 @@ router
     }
   })
   // create content by category code
-  .post('/:code/contents', async (req, res) => {
+  .post('/:code/contents', uploadFileToS3.array('photos', 5), async (req, res) => {
+    // 1. media파일 저장
+    console.log(req.files);
+    const savedFiles = req.files.map(file => {
+      const filename = iconv.decode(file.originalname, 'UTF-8');
+      const name = filename.substring(0, filename.lastIndexOf('.'));
+      const type = filename.substring(filename.lastIndexOf('.'));
+      return {
+        id: file.key,
+        name,
+        type
+      }
+    })
+    // 2. 컨텐츠 정보 저장
+    return res.status(200).json(savedFiles);
+    /*
     const { code: cg_code } = req.params;
     try {
       const category = await categoryService.get(cg_code);
@@ -84,6 +101,7 @@ router
       const errCode = error.name === 'DataMalformedError' ? 400 : 500;
       return res.status(errCode).send(new ErrorResponse(error));
     }
+    */
   })
 
 module.exports = router;

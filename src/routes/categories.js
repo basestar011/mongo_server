@@ -72,7 +72,7 @@ router
     }
   })
   // create content by category code
-  .post('/:code/contents', uploadFileToS3.array('photos', 5), async (req, res) => {
+  .post('/:code/contents', uploadFileToS3('contents', 'images'), async (req, res) => {
     // 1. media파일 저장
     console.log(req.files);
     const savedFiles = req.files.map(file => {

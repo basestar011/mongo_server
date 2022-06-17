@@ -10,7 +10,8 @@ const checkAuth = require('./src/utils/checkAuth');
 const auth = require('./src/routes/auth');
 const categories = require('./src/routes/categories');
 const contents = require('./src/routes/contents')
-const users = require('./src/routes/users')
+const users = require('./src/routes/users');
+const external = require('./src/routes/external');
 const mongoose = require('mongoose');
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/auth', auth);
 app.use('/categories', checkAuth, categories);
 app.use('/contents', checkAuth, contents);
 app.use('/users', users);
+app.use('/external', checkAuth, external);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => console.log(`express server on port ${port}`));

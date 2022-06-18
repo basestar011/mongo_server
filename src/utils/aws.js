@@ -9,6 +9,7 @@ const s3 = new S3Client({ region });
 
 /**
  * S3 특정 경로에 파일 업로드
+ * - access key id와 secret key는 env에서 자동 로드(@aws-sdk/client-s3)
  * @param {string} path 폴더설정( /contents/파일명 -> 'contents', /contents/etc/파일명 -> 'contents/etc' )
  * @param {string} fieldName 필드명
  * @param {number} limit 최대 업로드 갯수. 기본 = Infinity

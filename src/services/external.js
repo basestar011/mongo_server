@@ -1,6 +1,9 @@
+// file명 decoder
 const iconv = require('iconv-lite');
+const { deleteFileInS3 } = require('../utils/aws')
 
 /**
+ * multer-s3에서 넘겨주는 file object 일부
  * @typedef {Object} File
  * @property {string} fieldname
  * @property {string} originalname
@@ -20,13 +23,7 @@ const iconv = require('iconv-lite');
  */
 
 /**
- * @typedef {Object} Media
- * @property {string} id s3에 보여지는 파일명(폴더경로제외한 문자)
- * @property {string} name 업로드한 파일명(확장자 제외)
- * @property {string} path s3 폴더경로
- * @property {string} srclink image src에 사용할 수 있는 s3 이미지 로드 fullpath
- * @property {string} type 확장자명(.포함)
- * @property {number} size 파일 크기
+ * @typedef {import('./media.js').Media} Media
  */
 class ExternalService {
   constructor(decoder) {
@@ -34,20 +31,29 @@ class ExternalService {
   }
 
   /**
-   * 
+   * s3에 저장된 file정보를 media model형식으로 parsing
    * @param {File} file
    * @return {Media} media model
    */
-  getFileInfos(file) {
+  parseFileInfos(file) {
     const originalName = this.decoder.decode(file.originalname, 'UTF-8');
     return {
-        id: file.key.substring(file.key.lastIndexOf('/') + 1),
-        name: originalName.substring(0, originalName.lastIndexOf('.')),
-        path: file.location.split('/').splice(3).reverse().splice(1).reverse().join('/'),
-        srclink: file.location,
-        type: originalName.substring(originalName.lastIndexOf('.')),
-        size: file.size
+      id: file.key.substring(file.key.lastIndexOf('/') + 1),
+      name: originalName.substring(0, originalName.lastIndexOf('.')),
+      path: file.location.split('/').splice(3).reverse().splice(1).reverse().join('/'),
+      srclink: file.location,
+      type: originalName.substring(originalName.lastIndexOf('.')),
+      size: file.size
     }
+  }
+
+  /**
+   * S3에 저장된 파일 삭제
+   * @param {Media} media 
+   */
+  async deleteFileFromS3(id) {
+    const response = await deleteFileInS3(id);
+    return response;
   }
 }
 

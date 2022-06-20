@@ -48,10 +48,20 @@ function checkDetail(detail) {
   return null;
 }
 
+/**
+ * 컨텐츠의 타이틀과 카테고리 코드 체크
+ * @param {string} title 
+ * @param {string | number} cg_code 
+ * @returns {DataMalformedError | null}
+ */
+function checkTitleAndCgCode(title, cg_code) {
+  return checkTitle(title) || checkCategoryCode(cg_code);
+}
+
 function checkAll(title, categoryCode, detail) {
   return checkTitle(title) || checkCategoryCode(categoryCode) || checkDetail(detail)
 }
 
 module.exports = {
-  checkCode, checkTitle, checkCategoryCode, checkDetail, checkAll
+  checkCode, checkTitle, checkCategoryCode, checkDetail, checkTitleAndCgCode, checkAll
 }

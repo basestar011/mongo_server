@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const categoryService = require('../services/category');
-const contentService = require('../services/content')
+const contentService = require('../services/content');
+const mediaService = require('../services/media');
 const { ErrorResponse, DataNotFoundError } = require('../utils/errors')
 
 router
@@ -16,12 +17,12 @@ router
   })
   // create content
   .post('', async (req, res) => {
-    const { cg_code, title, detail } = req.body;
+    const { cg_code, title, detail, date, images } = req.body;
     const category = await categoryService.get(cg_code);
     if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code: cg_code })))
 
     try {
-      const contentCode = await contentService.create({ title, detail: detail || {}, cg_code });
+      const contentCode = await contentService.create({ title, detail: detail || {}, cg_code, date, images });
       return res.status(201).json({ code: contentCode });
     } catch (error) {
       return res.status(500).send(new ErrorResponse(error));

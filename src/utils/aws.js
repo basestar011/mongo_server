@@ -1,4 +1,4 @@
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const iconv = require('iconv-lite');
@@ -16,37 +16,52 @@ const s3 = new S3Client({ region });
  * @returns 
  */
 const uploadFileToS3 = (path, fieldName, limit = Infinity) => (req, res, next) => {
-    console.log('start upload file to s3');
+  console.log('start upload file to s3');
 
-    const upload = multer({
-        storage: multerS3({
-            s3,
-            bucket: bucket,
-            metadata(req, file, callback) { // s3에 저장되는 파일의 metadata 설정
-                callback(null, { fieldName: file.fieldname, fullName: iconv.decode(file.originalname, 'UTF-8') });
-            },
-            contentType: multerS3.AUTO_CONTENT_TYPE,
-            key(req, file, callback) { // s3에 저장되는 파일명
-                callback(null, `${ path ? path + '/' : ''}${Date.now().toString()}`);
-            },
-        })
-    }).array(fieldName, limit);
-
-    return upload(req, res, (error) => {
-        if(error instanceof multer.MulterError) {
-            console.log('Multer Error!', error);
-            return res.status(500).send('Multer Error!');
-        } else if(error) {
-            console.log('Internal Server Error!', error);
-            return res.status(500).send('Internal Server Error!');
-        }
-
-        console.log('File Upload Complete!!');
-        return next();
+  const upload = multer({
+    storage: multerS3({
+      s3,
+      bucket: bucket,
+      metadata(req, file, callback) { // s3에 저장되는 파일의 metadata 설정
+        const fullName = iconv.decode(file.originalname, 'UTF-8');
+        // const finalName = fullName.replace(/\s*/g, '').replace(/\n/g, '');
+        console.log(fullName);
+        callback(null, { fieldName: file.fieldname, fullName });
+      },
+      contentType: multerS3.AUTO_CONTENT_TYPE,
+      key(req, file, callback) { // s3에 저장되는 파일명
+        callback(null, `${ path ? path + '/' : ''}${Date.now().toString()}`);
+      },
     })
+  }).array(fieldName, limit);
+
+  return upload(req, res, (error) => {
+    if(error instanceof multer.MulterError) {
+      console.log('Multer Error!', error);
+      return res.status(500).send('Multer Error!');
+    } else if(error) {
+      console.log('Internal Server Error!', error);
+      return res.status(500).send('Internal Server Error!');
+    }
+
+    console.log('File Upload Complete!!');
+    return next();
+  })
+}
+
+/**
+ * 
+ * @param {Media} media 
+ */
+const deleteFileInS3 = async (key) => {
+  const command = new DeleteObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
+  return await s3.send(command);
 }
 
 module.exports = {
-    uploadFileToS3
+  uploadFileToS3, deleteFileInS3
 }
 

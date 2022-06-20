@@ -1,28 +1,33 @@
 const { Content } = require('../models');
-const { DataCreationError } = require('../utils/errors');
 const incrementCode = require('../utils/incrementCode');
 const categoryValidator = require('../utils/validation/category')
 const contentValidator = require('../utils/validation/content')
+const mediaService = require('./media');
 
 /**
  * @typedef {Object} Content
- * @property {number} code 콘텐츠 코드
- * @property {string} title 콘텐츠 제목
- * @property {object} detail 콘텐츠 상세
+ * @property {number} code 컨텐츠 코드
+ * @property {string} title 컨텐츠 제목
+ * @property {object} detail 컨텐츠 상세
+ * @property {Date} date 컨텐츠 날짜
+ * @property {Array<Media>} images 컨텐츠 이미지
  * @property {number} cg_code 카테고리 코드
- * @property {Date} created 콘텐츠 생성시간
- * @property {Date} modified 콘텐츠 수정시간
+ * @property {Date} created 컨텐츠 생성시간
+ * @property {Date} modified 컨텐츠 수정시간
  */
 
 class ContentService {
   modelName = 'content'
 
   /**
-   * @param {Object} model - mongoose Content Model
+   * @param {import('../models').Content} model - mongoose Content Model
+   * @param {incrementCode} generateCode - code generator
+   * @param {mediaService} mediaService
    */
-  constructor(model, generateCode) {
+  constructor(model, generateCode, mediaService) {
     this.model = model;
     this.generateCode = generateCode;
+    this.mediaService = mediaService;
   }
 
   /**
@@ -32,13 +37,26 @@ class ContentService {
    */
   async create(content) {
     /** 1. validation */
-    const { title, cg_code, detail } = content;
-    if(title === undefined || cg_code === undefined) throw new DataCreationError('title and Category code must not be undefined');
+    const { title, cg_code, date, images } = content;
+    const validateResult = contentValidator.checkTitleAndCgCode(title, cg_code);
+    if(validateResult) throw validateResult;
     /** 2. get content code : if content code exist, increment that and if not exist, create new one */
     const { code } = await this.generateCode(this.modelName);
-    /** 3. create category with next category code */
-    await this.model.create({ code, title, cg_code, detail, created: new Date(), modified: new Date() });
-
+    /** 3. create image media if present */
+    const isImagePresent = images !== undefined && images.length > 0;
+    const mediaArray = isImagePresent ? await this.mediaService.createAll(images) : [];
+    /** 4. create category with next category code */
+    await this.model.create({
+      code,
+      title,
+      cg_code,
+      detail,
+      date,
+      images: mediaArray,
+      created: new Date(),
+      modified: new Date()
+    });
+    
     return code;
   }
 
@@ -77,14 +95,14 @@ class ContentService {
   }
 
   /**
-   * 카테고리를 삭제한다.
-   * @param {string} code 카테고리 code
+   * 컨텐츠를 삭제한다.
+   * @param {number} code 컨텐츠 code
    * @returns {Promise<boolean>} 삭제 성공 여부
    */
-  // async delete(code) {
-  //   const deleted = await this.model.findOneAndDelete({ code })
-  //   return deleted !== null;
-  // }
+  async delete(code) {
+    const deleted = await this.model.findOneAndDelete({ code })
+    return deleted !== null;
+  }
 }
 
 module.exports = new ContentService(Content, incrementCode);

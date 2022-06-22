@@ -75,8 +75,8 @@ class ContentService {
    */
   async getAll() {
     // 1. 컨텐츠 조회
-    const contents = await this.model.find().select('-__v -_id');
-
+    const contents = await this.model.find().populate('media', { path: 'id'}).select('-__v -_id');
+    /*
     // 2. 컨텐츠에 포함된 image media id -> media model로 변환하여 값 세팅
     const mediaPromise = []; // promise 배열
     const promiseIndex = []; // media 파일을 조회한 컨텐츠 인덱스를 저장(해당 인덱스에 media파일을 넣어주기 위함)
@@ -96,7 +96,8 @@ class ContentService {
       result.status === 'fulfilled' && (contents[promiseIndex[i]].images = result.value);
       result.status === 'rejected' && console.error(`Image Load Error!! =>> Content ID [${contents[promiseIndex[i]].id}]`);
     });
-    
+    */
+
     return contents;
   }
 
@@ -133,6 +134,19 @@ class ContentService {
   async delete(code) {
     const deleted = await this.model.findOneAndDelete({ code })
     return deleted !== null;
+  }
+
+  /**
+   * 특정 카테고리에 속하는 컨텐츠 갯수 조회
+   * @param {number} cg_code
+   * @return {Promise<number>} 컨텐츠 갯수
+   * 
+   */
+  async getCountByCategory(cg_code) {
+    const validateResult = contentValidator.checkCategoryCode(cg_code);
+    if(validateResult) throw validateResult;
+    const count = await this.model.countDocuments({ cg_code });
+    return count;
   }
 }
 

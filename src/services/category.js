@@ -2,6 +2,7 @@ const { Category } = require('../models');
 const { DataCreationError } = require('../utils/errors');
 const incrementCode = require('../utils/incrementCode')
 const { checkCode, checkName, checkCodeAndName } = require('../utils/validation/category')
+const contentService = require('../services/content')
 
 /**
  * @typedef {Object} Category
@@ -16,10 +17,12 @@ class CategoryService {
   /**
    * @param {Object} model - mongoose Category Model
    * @param {Function} generateCode - Category 코드의 다음 숫자값 반환해주는 함수
+   * @param {contentService} contentService
    */
-  constructor(model, generateCode) {
+  constructor(model, generateCode, contentService) {
     this.model = model;
     this.generateCode = generateCode;
+    this.contentService = contentService;
   }
 
   /**
@@ -46,6 +49,13 @@ class CategoryService {
   async getAll() {
     const categories = await this.model.find().select('-__v -_id');
     return categories;
+  }
+
+  async getAllWithCount() {
+    const categories = await this.getAll();
+    categories.forEach(category => {
+      this.contentService.getCountByCategory(category.code)
+    });
   }
 
   /**
@@ -97,4 +107,4 @@ class CategoryService {
   }
 }
 
-module.exports = new CategoryService(Category, incrementCode);
+module.exports = new CategoryService(Category, incrementCode, contentService);

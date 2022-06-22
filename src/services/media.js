@@ -1,4 +1,5 @@
 const { Media } = require('../models');
+const { DataMalformedError } = require('../utils/errors');
 const mediaValidator = require('../utils/validation/media')
 
 class MediaService {
@@ -35,12 +36,30 @@ class MediaService {
   /**
    * media 조회
    * @param {string} id 
+   * @return {Promise<Media>}
    */
   async get(id) {
     const validateResult = mediaValidator.checkId(id);
     if(validateResult) throw validateResult;
     const media = await this.model.findOne({ id }).select('-__v -_id');
     return media;
+  }
+
+  /**
+   * 여러 개의 media 조회
+   * @param {string[]} ids
+   * @return {Promise<Media[]>}
+   */
+  async getAll(ids) {
+    const validateResult = ids
+      .map(id => mediaValidator.checkId(id))
+      .find(result => result !== null && result instanceof DataMalformedError);
+    if(validateResult) throw validateResult;
+    const medias = await this.model
+      .find()
+      .where('id').in(ids)
+      .select('-__v -_id');
+    return medias;
   }
 
   /**

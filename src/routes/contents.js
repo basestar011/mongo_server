@@ -22,8 +22,8 @@ router
     if(!category) return res.status(400).send(new ErrorResponse(new DataNotFoundError('Category', { code: cg_code })))
 
     try {
-      const contentCode = await contentService.create({ title, detail: detail || {}, cg_code, date, images });
-      return res.status(201).json({ code: contentCode });
+      const newContent = await contentService.create({ title, detail: detail || {}, cg_code, date, images });
+      return res.status(201).json(newContent);
     } catch (error) {
       return res.status(500).send(new ErrorResponse(error));
     }

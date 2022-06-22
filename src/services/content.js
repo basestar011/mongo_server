@@ -33,11 +33,11 @@ class ContentService {
   /**
    * 새 컨텐츠를 생성한다.
    * @param {Content} content 컨텐츠
-   * @returns {Promise<number>} 생성된 카테고리 코드
+   * @returns {Promise<Content>} 생성된 컨텐츠
    */
   async create(content) {
     /** 1. validation */
-    const { title, cg_code, date, images } = content;
+    const { title, cg_code, detail, date, images } = content;
     const validateResult = contentValidator.checkTitleAndCgCode(title, cg_code);
     if(validateResult) throw validateResult;
     /** 2. get content code : if content code exist, increment that and if not exist, create new one */
@@ -46,7 +46,7 @@ class ContentService {
     const isImagePresent = images !== undefined && images.length > 0;
     const mediaArray = isImagePresent ? await this.mediaService.createAll(images) : [];
     /** 4. create category with next category code */
-    await this.model.create({
+    const newContent = await this.model.create({
       code,
       title,
       cg_code,
@@ -56,8 +56,17 @@ class ContentService {
       created: new Date(),
       modified: new Date()
     });
-    
-    return code;
+
+    return {
+      code: newContent.code,
+      title: newContent.title,
+      cg_code: newContent.cg_code,
+      detail: newContent.detail,
+      date: newContent.date,
+      images: newContent.images,
+      created: newContent.created,
+      modified: newContent.modified
+    };
   }
 
   /**
@@ -65,7 +74,29 @@ class ContentService {
    * @returns {Promise<Array<Category>>}
    */
   async getAll() {
+    // 1. 컨텐츠 조회
     const contents = await this.model.find().select('-__v -_id');
+
+    // 2. 컨텐츠에 포함된 image media id -> media model로 변환하여 값 세팅
+    const mediaPromise = []; // promise 배열
+    const promiseIndex = []; // media 파일을 조회한 컨텐츠 인덱스를 저장(해당 인덱스에 media파일을 넣어주기 위함)
+    // 2-1. 각 컨텐츠의 images에서 image id 배열로 media 데이터 조회
+    contents.forEach((content, i) => {
+      const images = content.images;
+      if(images && images.length > 0) {
+        mediaPromise.push(this.mediaService.getAll(images));
+        promiseIndex.push(i);
+      }
+    });
+
+    const results = await Promise.allSettled(mediaPromise);
+    // 3. 조회한 media data를 컨텐츠의 images에 세팅 (reject된 경우는 로그 찍고 넘어감.)
+    results.forEach((result, i) => {
+      console.log(`Promise Result: ${result}`);
+      result.status === 'fulfilled' && (contents[promiseIndex[i]].images = result.value);
+      result.status === 'rejected' && console.error(`Image Load Error!! =>> Content ID [${contents[promiseIndex[i]].id}]`);
+    });
+    
     return contents;
   }
 
@@ -105,4 +136,4 @@ class ContentService {
   }
 }
 
-module.exports = new ContentService(Content, incrementCode);
+module.exports = new ContentService(Content, incrementCode, mediaService);

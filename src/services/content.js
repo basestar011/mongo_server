@@ -52,7 +52,6 @@ class ContentService {
       cg_code,
       detail,
       date,
-      images: mediaArray,
       created: new Date(),
       modified: new Date()
     });
@@ -63,7 +62,7 @@ class ContentService {
       cg_code: newContent.cg_code,
       detail: newContent.detail,
       date: newContent.date,
-      images: newContent.images,
+      images: mediaArray,
       created: newContent.created,
       modified: newContent.modified
     };
@@ -134,19 +133,6 @@ class ContentService {
   async delete(code) {
     const deleted = await this.model.findOneAndDelete({ code })
     return deleted !== null;
-  }
-
-  /**
-   * 특정 카테고리에 속하는 컨텐츠 갯수 조회
-   * @param {number} cg_code
-   * @return {Promise<number>} 컨텐츠 갯수
-   * 
-   */
-  async getCountByCategory(cg_code) {
-    const validateResult = contentValidator.checkCategoryCode(cg_code);
-    if(validateResult) throw validateResult;
-    const count = await this.model.countDocuments({ cg_code });
-    return count;
   }
 }
 

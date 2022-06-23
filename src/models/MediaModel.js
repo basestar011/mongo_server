@@ -16,7 +16,8 @@ const mediaSchema = mongoose.Schema({
   path: String, // file path(s3 folder)
   srclink: String, // file src link
   type: String, // file extension
-  size: Number // file size
+  size: Number, // file size
+  ct_code: Number // content code
 });
 
 const Media = mongoose.model('Media', mediaSchema);

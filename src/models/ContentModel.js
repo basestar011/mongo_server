@@ -5,10 +5,15 @@ const contentSchema = mongoose.Schema({
   title: String,
   detail: Object,
   date: Date,
-  images: Array,
   cg_code: Number,
   created: Date,
   modified: Date
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true }, id: false });
+
+contentSchema.virtual('images', {
+  ref: 'Media',
+  localField: 'code',
+  foreignField: 'ct_code',
 });
 
 const Content = mongoose.model('Content', contentSchema);
